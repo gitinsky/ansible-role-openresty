@@ -1,0 +1,7 @@
+---
+- name: install dependencies on Solaris
+  pkgin: name={{ item }} state=present
+  with_items:
+      - gcc-3
+      - SUNWlibm
+      - curl

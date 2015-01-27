@@ -1,0 +1,15 @@
+---
+- name: install dependencies on Debian
+  apt: name={{ item }} state=present update_cache=yes
+  with_items:
+      - libreadline-dev
+      - libncurses5-dev
+      - libpcre3-dev
+      - libssl-dev
+      - perl
+      - make
+      - curl            # for version determining
+      - libxslt-dev     # for Xml xslt
+      - libgd2-xpm      # GD Library
+      - libgd2-xpm-dev  # GD Library
+      - checkinstall

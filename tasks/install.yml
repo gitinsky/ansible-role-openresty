@@ -1,0 +1,51 @@
+---
+- name: download openresty
+  get_url: url=http://openresty.org/download/ngx_openresty-{{ openresty_version }}.tar.gz
+           dest=/root/ngx_openresty-{{ openresty_version }}.tar.gz
+
+- name: Unarchive openresty
+  unarchive: src=/root/ngx_openresty-{{ openresty_version }}.tar.gz
+             dest=/root
+             copy=no
+
+- name: Install openresty
+  command: "{{ item }} chdir=/root/ngx_openresty-{{ openresty_version }}"
+  with_items:
+    - ./configure --with-http_realip_module --with-http_addition_module --with-http_xslt_module --with-http_image_filter_module --with-http_sub_module --with-http_dav_module --with-http_flv_module --with-http_gzip_static_module --with-http_auth_request_module --with-http_random_index_module --with-http_secure_link_module --with-http_degradation_module --with-http_stub_status_module
+    - make -j{{ ansible_processor_cores }}
+    - checkinstall -D -y
+    # - checkinstall -D --pkgname ngx-openresty --pakdir ./ --pkgversion {{ openresty_version }} -y
+    # - make install
+
+- name: remove build files
+  file: path={{ item }}
+        state=absent
+  with_items:
+      - /root/ngx_openresty-{{ openresty_version }}.tar.gz
+      - /root/ngx_openresty-{{ openresty_version }}
+
+- name: check if /usr/local/openresty/nginx/conf is a directory
+  stat: path=/usr/local/openresty/nginx/conf
+  register: openresty_conf
+  
+- name: remove conf directory
+  file: path=/usr/local/openresty/nginx/conf state=absent
+  when: openresty_conf.stat.isdir
+  
+- name: create symlinks
+  file: state=link src=/etc/nginx dest=/usr/local/openresty/nginx/conf
+
+- name: stop nginx before replacing it
+  command: service nginx stop
+           creates=/usr/sbin/nginx_orig
+
+
+- name: move original binary
+  command: mv -v /usr/sbin/nginx /usr/sbin/nginx_orig
+           creates=/usr/sbin/nginx_orig
+
+- name: create symlink for binary
+  file: state=link src=/usr/local/openresty/nginx/sbin/nginx dest=/usr/sbin/nginx
+  
+- name: start nginx service
+  service: name=nginx state=started

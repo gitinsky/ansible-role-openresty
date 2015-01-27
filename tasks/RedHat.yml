@@ -1,0 +1,8 @@
+---
+- name: install dependencies on Redhat
+  yum: name={{ item }} state=present update_cache=yes
+  with_items:
+      - readline-devel
+      - pcre-devel
+      - openssl-devel
+      - curl

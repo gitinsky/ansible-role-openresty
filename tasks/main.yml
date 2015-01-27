@@ -1,0 +1,40 @@
+---
+- include_vars: "{{ ansible_os_family }}.yml"
+
+# CentOS specific package installations
+- include: RedHat.yml
+  when: ansible_os_family  == "RedHat"
+
+# Debian specific package installations
+# - include: Debian.yml
+#   when: ansible_os_family  == "Debian"
+
+# Solaris specific package installations
+- include: Solaris.yml
+  when: ansible_os_family == "Solaris"
+
+#
+
+- name: check if already installed and get version
+  shell: dpkg -s ngx-openresty|grep Version| sed -E 's/.* (.*)-.*/\1/'
+  register: resty_installed_version
+  changed_when: "'never' == 'changed'"  
+
+- name: set installed version
+  set_fact:
+      openresty_installed_version: "{{ resty_installed_version.stdout }}"
+  when: "'not installed' not in resty_installed_version.stderr and openresty_version != 'any'"
+
+- name: if openresty_version is set to latest we should determine the version
+  shell: curl -s 'http://openresty.org/#Download'|grep -A1 "Lastest release"|grep -o "\[ngx_openresty-[0-9.]*.tar.gz"|sed -E 's/\[ngx_openresty-([0-9.]{1,}).tar.*/\1/'
+  register: openresty_version_latest
+  changed_when: "'never changed' == 'never changed'"
+  when: openresty_version in ["latest", "any"]
+
+- name: set openresty_version
+  set_fact:
+      openresty_version: "{{ openresty_version_latest.stdout }}"
+  when: openresty_version in ["latest", "any"]
+
+- include: install.yml
+  # when: openresty_installed_version is undefined or openresty_installed_version != openresty_version

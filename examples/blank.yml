@@ -1,0 +1,6 @@
+- hosts: blank_example
+  sudo: yes
+  roles:
+    - role: blank
+      tags:
+        - blank
