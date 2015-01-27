@@ -37,4 +37,4 @@
   when: openresty_version in ["latest", "any"]
 
 - include: install.yml
-  # when: openresty_installed_version is undefined or openresty_installed_version != openresty_version
+  when: openresty_installed_version is undefined or openresty_installed_version != openresty_version
