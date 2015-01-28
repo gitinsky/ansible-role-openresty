@@ -4,8 +4,8 @@
   when: ansible_os_family  == "RedHat"
 
 # Debian specific package installations
-# - include: Debian.yml
-#   when: ansible_os_family  == "Debian"
+- include: Debian.yml
+  when: ansible_os_family  == "Debian"
 
 # Solaris specific package installations
 - include: Solaris.yml
