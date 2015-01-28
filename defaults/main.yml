@@ -1,4 +1,4 @@
 ---
-openresty_version: latest
-# openresty_version: any
+# openresty_version: latest
+openresty_version: any
 # openresty_version: 1.7.7.1

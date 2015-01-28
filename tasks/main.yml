@@ -26,7 +26,7 @@
 - name: if openresty_version is set to latest we should determine the version
   shell: curl -s 'http://openresty.org/#Download'|grep -A1 "Lastest release"|grep -o "\[ngx_openresty-[0-9.]*.tar.gz"|sed -E 's/\[ngx_openresty-([0-9.]{1,}).tar.*/\1/'
   register: openresty_version_latest
-  changed_when: "'never changed' == 'never changed'"
+  changed_when: "'never' == 'changed'"
   when: openresty_version in ["latest", "any"]
 
 - name: set openresty_version
@@ -35,4 +35,4 @@
   when: openresty_version in ["latest", "any"]
 
 - include: install.yml
-  when: openresty_installed_version is undefined or openresty_installed_version != openresty_version
+  when: openresty_installed_version is undefined or openresty_installed_version == '' or openresty_installed_version != openresty_version
